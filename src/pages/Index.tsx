@@ -1,15 +1,8 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
 
-const MAIN_IMAGE = "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/ef13f638-e2ae-4db8-8eab-f9f45eb49e81.jpg";
 const LIFESTYLE_IMAGE = "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/b4467fc6-d5a1-4022-9902-f972e4b31236.jpg";
-
-const THUMBS = [
-  { id: 0, src: MAIN_IMAGE, label: "Flat lay" },
-  { id: 1, src: "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/bcf6bd8e-cc86-420b-8f1c-af46415455f0.jpg", label: "Print close" },
-  { id: 2, src: LIFESTYLE_IMAGE, label: "Lifestyle" },
-  { id: 3, src: "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/6daebb63-7b43-4bbe-907b-6ec1f1b928a6.jpg", label: "Interior" },
-];
+const INTERIOR_IMAGE = "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/6daebb63-7b43-4bbe-907b-6ec1f1b928a6.jpg";
 
 const SIZES = ["С", "М", "Л", "XL", "XXL", "XXXL"];
 
@@ -19,16 +12,16 @@ const PLANES = [
 ];
 
 const COLOR_SCHEMES = [
-  { id: "red-blue",    colors: ["#b91c1c", "#1d4ed8"] },
-  { id: "navy-gold",   colors: ["#1e3a5f", "#c8a731"] },
-  { id: "teal-slate",  colors: ["#0f766e", "#475569"] },
-  { id: "pink-purple", colors: ["#db2777", "#7c3aed"] },
-  { id: "white",       colors: ["#ffffff"] },
-  { id: "navy-red",    colors: ["#1e3a5f", "#b91c1c"] },
-  { id: "rose-navy",   colors: ["#e11d48", "#1e3a5f"] },
-  { id: "navy-khaki",  colors: ["#1e3a5f", "#78716c"] },
-  { id: "slate-navy",  colors: ["#475569", "#1e3a5f"] },
-  { id: "crossed",     colors: ["#b91c1c", "#1e3a5f", "diagonal"] },
+  { id: "red-blue",    c1: "#b91c1c", c2: "#1d4ed8" },
+  { id: "navy-gold",   c1: "#1e3a5f", c2: "#c8a731" },
+  { id: "teal-slate",  c1: "#0f766e", c2: "#475569" },
+  { id: "pink-purple", c1: "#db2777", c2: "#7c3aed" },
+  { id: "white",       c1: "#e5e7eb", c2: "#9ca3af" },
+  { id: "navy-red",    c1: "#1e3a5f", c2: "#b91c1c" },
+  { id: "rose-navy",   c1: "#e11d48", c2: "#1e3a5f" },
+  { id: "navy-khaki",  c1: "#1e3a5f", c2: "#78716c" },
+  { id: "slate-navy",  c1: "#475569", c2: "#1e3a5f" },
+  { id: "crossed",     c1: "#b91c1c", c2: "#1e3a5f" },
 ];
 
 const TAIL_COLORS = [
@@ -36,22 +29,131 @@ const TAIL_COLORS = [
   "#92400e", "#f97316", "#1d4ed8", "#06b6d4", "#0f766e",
 ];
 
-const STYLE_THUMBS = [
-  { id: 0, label: "Классик" },
-  { id: 1, label: "Ретро" },
-  { id: 2, label: "Боулд" },
-  { id: 3, label: "Минимал" },
-  { id: 4, label: "Нео" },
-];
+const STYLE_LABELS = ["Классик", "Ретро", "Боулд", "Минимал", "Нео"];
 
-const LIVERY_ROWS = [
-  [0, 1, 2, 3, 4],
-  [5, 6, 7, 8, 9],
-  ["more"],
-];
+// SVG preview of the tshirt with live data
+function TshirtPreview({ c1, c2, date, plane, studentName, cfiName, airport, tailNum, tailColor }: {
+  c1: string; c2: string;
+  date: string; plane: string;
+  studentName: string; cfiName: string;
+  airport: string; tailNum: string; tailColor: string;
+}) {
+  const displayDate = date || "12.17.1903";
+  const displayStudent = studentName || "Орвилл Райт";
+  const displayCfi = cfiName || "Георгий Цыфаркин";
+  const displayAirport = airport || "КФФА";
+  const displayPlane = plane || "Cessna 172";
+  const displayTail = tailNum || "N75200";
+
+  return (
+    <svg viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
+      {/* T-shirt shape */}
+      <defs>
+        <clipPath id="shirtClip">
+          <path d="M80,60 L30,100 L65,130 L65,380 L335,380 L335,130 L370,100 L320,60 L270,85 C260,95 250,100 200,100 C150,100 140,95 130,85 Z" />
+        </clipPath>
+        <filter id="shadow">
+          <feDropShadow dx="0" dy="4" stdDeviation="8" floodOpacity="0.15"/>
+        </filter>
+      </defs>
+
+      {/* shirt body */}
+      <path
+        d="M80,60 L30,100 L65,130 L65,380 L335,380 L335,130 L370,100 L320,60 L270,85 C260,95 250,100 200,100 C150,100 140,95 130,85 Z"
+        fill="#f8fafc"
+        stroke="#e2e8f0"
+        strokeWidth="2"
+        filter="url(#shadow)"
+      />
+      {/* shirt shading */}
+      <path d="M65,130 L65,380 L110,380 L110,130 Z" fill="#e2e8f0" opacity="0.3"/>
+      <path d="M335,130 L335,380 L290,380 L290,130 Z" fill="#e2e8f0" opacity="0.3"/>
+
+      {/* === BADGE design === */}
+      {/* outer ring */}
+      <circle cx="200" cy="230" r="108" fill={c1} />
+      <circle cx="200" cy="230" r="100" fill="none" stroke="#fff" strokeWidth="2" opacity="0.4"/>
+      <circle cx="200" cy="230" r="95" fill={c2} />
+      <circle cx="200" cy="230" r="87" fill="none" stroke="#fff" strokeWidth="1.5" opacity="0.5"/>
+
+      {/* inner bg */}
+      <circle cx="200" cy="230" r="83" fill="#fff" />
+
+      {/* TOP arc text: TODAY BEGINS */}
+      <path id="topArc" d="M 118,200 A 82,82 0 0,1 282,200" fill="none"/>
+      <text fontSize="9" fontFamily="Arial Black, Arial" fontWeight="900" fill={c1} letterSpacing="3">
+        <textPath href="#topArc" startOffset="50%" textAnchor="middle">TODAY BEGINS</textPath>
+      </text>
+
+      {/* FIRST SOLO banner */}
+      <rect x="118" y="175" width="164" height="34" rx="4" fill={c1} />
+      <text x="200" y="196" textAnchor="middle" fontSize="20" fontFamily="Arial Black, Arial" fontWeight="900" fill="#fff" letterSpacing="1">FIRST SOLO</text>
+
+      {/* Date */}
+      <text x="200" y="218" textAnchor="middle" fontSize="10" fontFamily="Arial, sans-serif" fontWeight="700" fill={c1} letterSpacing="1">
+        {displayDate}
+      </text>
+
+      {/* Plane SVG simplified (Cessna-like) */}
+      <g transform="translate(200,240) scale(0.85)">
+        {/* fuselage */}
+        <ellipse cx="0" cy="0" rx="55" ry="9" fill={c2} />
+        {/* nose */}
+        <ellipse cx="52" cy="0" rx="8" ry="7" fill={c2} />
+        {/* tail fin */}
+        <path d="M-50,-9 L-60,-28 L-40,-9 Z" fill={c2} />
+        <path d="M-48,9 L-60,24 L-38,9 Z" fill={c2} opacity="0.7"/>
+        {/* main wing */}
+        <path d="M-10,-9 L-20,-32 L30,-32 L20,-9 Z" fill={c1} />
+        <path d="M-10,9 L-20,30 L30,30 L20,9 Z" fill={c1} opacity="0.6"/>
+        {/* prop */}
+        <circle cx="58" cy="0" r="4" fill="#374151"/>
+        <line x1="58" y1="-12" x2="58" y2="12" stroke="#374151" strokeWidth="2.5" strokeLinecap="round"/>
+        {/* tail number on fuselage */}
+        <text x="-5" y="4" textAnchor="middle" fontSize="6" fontFamily="Arial, sans-serif" fontWeight="700" fill={tailColor === "#ffffff" ? "#374151" : tailColor}>
+          {displayTail}
+        </text>
+      </g>
+
+      {/* Airport badge */}
+      <rect x="168" y="254" width="64" height="14" rx="2" fill={c2} opacity="0.9"/>
+      <text x="200" y="264" textAnchor="middle" fontSize="7" fontFamily="Arial, sans-serif" fontWeight="700" fill="#fff" letterSpacing="1">
+        {displayAirport}
+      </text>
+
+      {/* Student pilot line */}
+      <text x="200" y="279" textAnchor="middle" fontSize="7.5" fontFamily="Arial, sans-serif" fontWeight="700" fill="#374151">
+        Student Pilot: {displayStudent.length > 18 ? displayStudent.slice(0, 18) + "…" : displayStudent}
+      </text>
+
+      {/* CFI line */}
+      <text x="200" y="291" textAnchor="middle" fontSize="7" fontFamily="Arial, sans-serif" fill="#6b7280">
+        CFI: {displayCfi.length > 20 ? displayCfi.slice(0, 20) + "…" : displayCfi}
+      </text>
+
+      {/* Plane model */}
+      <text x="200" y="303" textAnchor="middle" fontSize="7" fontFamily="Arial, sans-serif" fill="#6b7280" fontStyle="italic">
+        {displayPlane.length > 22 ? displayPlane.slice(0, 22) + "…" : displayPlane}
+      </text>
+
+      {/* BORN TO FLY bottom banner */}
+      <rect x="118" y="308" width="164" height="30" rx="4" fill={c1} />
+      <text x="200" y="327" textAnchor="middle" fontSize="18" fontFamily="Arial Black, Arial" fontWeight="900" fill="#fff" letterSpacing="1">BORN TO FLY</text>
+
+      {/* BOTTOM arc text: THE PILOT'S JOURNEY */}
+      <path id="botArc" d="M 120,265 A 82,82 0 0,0 280,265" fill="none"/>
+      <text fontSize="7.5" fontFamily="Arial, sans-serif" fontWeight="600" fill={c2} letterSpacing="2">
+        <textPath href="#botArc" startOffset="50%" textAnchor="middle">THE PILOT'S JOURNEY</textPath>
+      </text>
+
+      {/* collar */}
+      <path d="M170,60 Q200,80 230,60" fill="none" stroke="#cbd5e1" strokeWidth="3" strokeLinecap="round"/>
+    </svg>
+  );
+}
 
 export default function Index() {
-  const [activeThumb, setActiveThumb] = useState(0);
+  const [previewMode, setPreviewMode] = useState<"live" | "photo1" | "photo2">("live");
   const [size, setSize] = useState("М");
   const [styleId, setStyleId] = useState(0);
   const [dateFmt, setDateFmt] = useState("us");
@@ -75,10 +177,25 @@ export default function Index() {
   const OLD_PRICE = 43.00;
   const DISCOUNT = Math.round(100 - (PRICE / OLD_PRICE) * 100);
 
+  const activeScheme = COLOR_SCHEMES.find((s) => s.id === colorScheme) || COLOR_SCHEMES[0];
+
+  // Format date for display on shirt
+  const formatDate = () => {
+    if (!soloDate) return "12.17.1903";
+    const [y, m, d] = soloDate.split("-");
+    return dateFmt === "us" ? `${m}.${d}.${y}` : `${d}.${m}.${y}`;
+  };
+
   function handleAddToCart() {
     setCartMsg(true);
     setTimeout(() => setCartMsg(false), 3000);
   }
+
+  const PHOTO_THUMBS = [
+    { id: "live", label: "Превью", isLive: true },
+    { id: "photo1", label: "Лайфстайл", src: LIFESTYLE_IMAGE },
+    { id: "photo2", label: "Интерьер", src: INTERIOR_IMAGE },
+  ];
 
   return (
     <div style={{ minHeight: "100vh", background: "#fff", color: "#111827" }}>
@@ -87,50 +204,34 @@ export default function Index() {
       <header style={{ borderBottom: "1px solid #e5e7eb", background: "#fff", position: "sticky", top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
-            {/* Logo */}
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-              <div style={{
-                width: 48, height: 48,
-                background: "#1e3a5f",
-                borderRadius: "50%",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#fff", fontWeight: 900, fontSize: "0.65rem", textAlign: "center", lineHeight: 1.2,
-                letterSpacing: "0.02em"
-              }}>
+              <div style={{ width: 48, height: 48, background: "#1e3a5f", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: "0.6rem", textAlign: "center", lineHeight: 1.2 }}>
                 DUSTY<br/>FLYER
               </div>
-              <span style={{ fontWeight: 900, fontSize: "0.85rem", letterSpacing: "0.05em", textTransform: "uppercase", color: "#1e3a5f" }}>
-                Dusty Flyer
-              </span>
+              <span style={{ fontWeight: 900, fontSize: "0.85rem", letterSpacing: "0.05em", textTransform: "uppercase", color: "#1e3a5f" }}>Dusty Flyer</span>
             </div>
-
-            {/* Nav desktop */}
-            <nav style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }} className="hidden md:flex">
-              {["Дом", "Америка250", "Футболки на заказ", "Декор для стен", "Футболки ▾", "О ▾"].map((item) => (
+            <nav className="hidden md:flex" style={{ display: "flex", alignItems: "center", gap: 24 }}>
+              {["Дом", "Америка250", "Футболки на заказ", "Декор для стен", "Футболки ▾", "О ▾", "Посмотреть все"].map((item) => (
                 <span key={item} className="nav-link" style={{ fontSize: "0.82rem", whiteSpace: "nowrap" }}>{item}</span>
               ))}
-              <span className="nav-link" style={{ fontSize: "0.82rem" }}>Посмотреть все</span>
             </nav>
-
-            {/* Right */}
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <div style={{ fontSize: "0.75rem", color: "#6b7280", textAlign: "right", lineHeight: 1.4 }} className="hidden md:block">
                 Соединённые Штаты | USD $
               </div>
-              <Icon name="Search" size={20} style={{ color: "#374151", cursor: "pointer" }} />
-              <Icon name="User" size={20} style={{ color: "#374151", cursor: "pointer" }} />
-              <Icon name="ShoppingCart" size={20} style={{ color: "#374151", cursor: "pointer" }} />
+              <Icon name="Search" size={20} />
+              <Icon name="User" size={20} />
+              <Icon name="ShoppingCart" size={20} />
               <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
                 <Icon name="Menu" size={22} />
               </button>
             </div>
           </div>
         </div>
-        {/* Mobile nav */}
         {menuOpen && (
           <div style={{ borderTop: "1px solid #e5e7eb", padding: "12px 24px", background: "#fff" }}>
-            {["Дом", "Америка250", "Футболки на заказ", "Декор для стен", "Футболки", "О нас", "Посмотреть все"].map((item) => (
-              <div key={item} style={{ padding: "8px 0", fontSize: "0.875rem", color: "#374151", cursor: "pointer", borderBottom: "1px solid #f3f4f6" }}>{item}</div>
+            {["Дом", "Футболки на заказ", "Декор для стен", "Посмотреть все"].map((item) => (
+              <div key={item} style={{ padding: "8px 0", fontSize: "0.875rem", borderBottom: "1px solid #f3f4f6", cursor: "pointer" }}>{item}</div>
             ))}
           </div>
         )}
@@ -138,126 +239,131 @@ export default function Index() {
 
       {/* BREADCRUMB */}
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "10px 24px", fontSize: "0.75rem", color: "#9ca3af" }}>
-        <span className="nav-link">flicker.com</span>
+        flicker.com
       </div>
 
       {/* PRODUCT */}
       <main style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px 60px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}
-             className="block md:grid">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }} className="block md:grid">
 
           {/* LEFT: Gallery */}
-          <div>
-            {/* Main image */}
-            <div style={{ position: "relative", background: "#f9fafb", borderRadius: 8, overflow: "hidden", marginBottom: 12 }}>
-              <img
-                src={THUMBS[activeThumb].src}
-                alt="product"
-                style={{ width: "100%", aspectRatio: "1/1", objectFit: "cover", display: "block" }}
-              />
-              <button
-                onClick={() => setActiveThumb((p) => Math.max(0, p - 1))}
-                style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.9)", border: "1px solid #e5e7eb", borderRadius: "50%", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
-              >
-                <Icon name="ChevronLeft" size={18} />
-              </button>
-              <button
-                onClick={() => setActiveThumb((p) => Math.min(THUMBS.length - 1, p + 1))}
-                style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.9)", border: "1px solid #e5e7eb", borderRadius: "50%", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
-              >
-                <Icon name="ChevronRight" size={18} />
-              </button>
+          <div style={{ position: "sticky", top: 80 }}>
+            {/* Main view */}
+            <div style={{ background: previewMode === "live" ? "#f0f4ff" : "#f9fafb", borderRadius: 12, overflow: "hidden", marginBottom: 12, aspectRatio: "1/1", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", border: "1px solid #e5e7eb" }}>
+              {previewMode === "live" ? (
+                <div style={{ width: "85%", height: "85%" }}>
+                  <TshirtPreview
+                    c1={activeScheme.c1}
+                    c2={activeScheme.c2}
+                    date={formatDate()}
+                    plane={plane}
+                    studentName={studentName}
+                    cfiName={cfiName}
+                    airport={airport}
+                    tailNum={tailNum}
+                    tailColor={tailColor}
+                  />
+                </div>
+              ) : (
+                <img
+                  src={previewMode === "photo1" ? LIFESTYLE_IMAGE : INTERIOR_IMAGE}
+                  alt="product"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              )}
+              {previewMode === "live" && (
+                <div style={{ position: "absolute", top: 12, left: 12, background: "#1a56db", color: "#fff", fontSize: "0.68rem", fontWeight: 700, padding: "3px 10px", borderRadius: 20, letterSpacing: "0.05em" }}>
+                  ● LIVE ПРЕВЬЮ
+                </div>
+              )}
             </div>
+
             {/* Thumbnails */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
-              {THUMBS.map((t) => (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+              {PHOTO_THUMBS.map((t) => (
                 <div
                   key={t.id}
-                  onClick={() => setActiveThumb(t.id)}
+                  onClick={() => setPreviewMode(t.id as "live" | "photo1" | "photo2")}
                   style={{
                     borderRadius: 6, overflow: "hidden", cursor: "pointer", aspectRatio: "1/1",
-                    border: activeThumb === t.id ? "2px solid #1a56db" : "2px solid #e5e7eb",
-                    transition: "border-color 0.15s"
+                    border: previewMode === t.id ? "2px solid #1a56db" : "2px solid #e5e7eb",
+                    transition: "border-color 0.15s",
+                    background: t.isLive ? "#f0f4ff" : "#f9fafb",
+                    display: "flex", alignItems: "center", justifyContent: "center",
                   }}
                 >
-                  <img src={t.src} alt={t.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  {t.isLive ? (
+                    <div style={{ width: "90%", height: "90%" }}>
+                      <TshirtPreview
+                        c1={activeScheme.c1}
+                        c2={activeScheme.c2}
+                        date={formatDate()}
+                        plane={plane}
+                        studentName={studentName}
+                        cfiName={cfiName}
+                        airport={airport}
+                        tailNum={tailNum}
+                        tailColor={tailColor}
+                      />
+                    </div>
+                  ) : (
+                    <img src={t.src} alt={t.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  )}
                 </div>
               ))}
             </div>
+
+            <p style={{ fontSize: "0.72rem", color: "#9ca3af", textAlign: "center", marginTop: 8 }}>
+              Превью обновляется в реальном времени при заполнении формы
+            </p>
           </div>
 
           {/* RIGHT: Product info */}
           <div style={{ paddingTop: 4 }}>
-            {/* Title */}
-            <h1 style={{ fontSize: "1.6rem", fontWeight: 700, lineHeight: 1.3, marginBottom: 12, color: "#111827" }}>
+            <h1 style={{ fontSize: "1.6rem", fontWeight: 700, lineHeight: 1.3, marginBottom: 12 }}>
               Футболка «Первый пилот-одиночка» (с персонализацией)
             </h1>
-
-            {/* Tax/shipping */}
             <p style={{ fontSize: "0.78rem", color: "#6b7280", marginBottom: 10 }}>
               Налоги включены.{" "}
               <span style={{ textDecoration: "underline", cursor: "pointer" }}>Стоимость доставки</span>{" "}
               рассчитывается при оформлении заказа.
             </p>
-
-            {/* Shop Pay */}
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14, fontSize: "0.78rem", color: "#6b7280" }}>
-              <span>Оплата в рассрочку для заказов свыше</span>
+              <span>Оплата в рассрочку от</span>
               <strong style={{ color: "#5a31f4" }}>35,00 $</strong>
-              <span>с</span>
               <span style={{ background: "#5a31f4", color: "#fff", borderRadius: 3, padding: "1px 6px", fontWeight: 700, fontSize: "0.7rem" }}>shop</span>
               <span style={{ color: "#5a31f4", fontWeight: 600 }}>Pay</span>
               <span style={{ color: "#5a31f4", textDecoration: "underline", cursor: "pointer" }}>Узнать больше</span>
             </div>
-
-            {/* Price */}
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-              <span style={{ fontSize: "1.5rem", fontWeight: 700, color: "#b91c1c" }}>
-                {PRICE.toFixed(2)} долларов США
-              </span>
-              <span style={{ fontSize: "0.95rem", color: "#9ca3af", textDecoration: "line-through" }}>
-                {OLD_PRICE.toFixed(2)} долларов США
-              </span>
+              <span style={{ fontSize: "1.5rem", fontWeight: 700, color: "#b91c1c" }}>{PRICE.toFixed(2)} долларов США</span>
+              <span style={{ fontSize: "0.95rem", color: "#9ca3af", textDecoration: "line-through" }}>{OLD_PRICE.toFixed(2)} долларов США</span>
               <span className="discount-badge">Экономия {DISCOUNT}%</span>
             </div>
 
-            {/* Available products */}
+            {/* Product type */}
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.05em", color: "#374151", marginBottom: 8, textTransform: "uppercase" }}>
-                Доступные товары
-              </div>
-              <select
-                className="form-input"
-                style={{ maxWidth: 320 }}
-                defaultValue="premium"
-              >
-                <option value="premium">Футболка (премиум-класса, унис…</option>
-                <option value="hoodie">Худи (премиум-класса)</option>
-                <option value="long">Лонгслив</option>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.05em", color: "#374151", marginBottom: 8, textTransform: "uppercase" }}>Доступные товары</div>
+              <select className="form-input" style={{ maxWidth: 320 }}>
+                <option>Футболка (премиум-класса, унис…</option>
+                <option>Худи (премиум-класса)</option>
+                <option>Лонгслив</option>
               </select>
             </div>
 
             {/* Size */}
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.05em", color: "#374151", marginBottom: 8, textTransform: "uppercase" }}>
-                Размер
-              </div>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.05em", color: "#374151", marginBottom: 8, textTransform: "uppercase" }}>Размер</div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {SIZES.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setSize(s)}
-                    className={`size-pill${size === s ? " active" : ""}`}
-                  >
-                    {s}
-                  </button>
+                  <button key={s} onClick={() => setSize(s)} className={`size-pill${size === s ? " active" : ""}`}>{s}</button>
                 ))}
               </div>
             </div>
 
             {/* PERSONALIZE */}
             <div style={{ border: "1px solid #e5e7eb", borderRadius: 6, overflow: "hidden", marginBottom: 20 }}>
-              <div style={{ background: "#f9fafb", padding: "14px 16px", fontWeight: 700, fontSize: "0.85rem", letterSpacing: "0.05em", textAlign: "center", textTransform: "uppercase", color: "#111827", borderBottom: "1px solid #e5e7eb" }}>
+              <div style={{ background: "#f9fafb", padding: "14px 16px", fontWeight: 700, fontSize: "0.85rem", letterSpacing: "0.05em", textAlign: "center", textTransform: "uppercase", borderBottom: "1px solid #e5e7eb" }}>
                 Персонализировать
               </div>
               <div style={{ padding: "16px" }}>
@@ -265,16 +371,22 @@ export default function Index() {
                 {/* Style */}
                 <div style={{ marginBottom: 16 }}>
                   <div className="field-label">Стиль дизайна <span className="req">*</span></div>
-                  <div className="thumb-grid">
-                    {STYLE_THUMBS.map((st) => (
-                      <img
-                        key={st.id}
-                        src={MAIN_IMAGE}
-                        alt={st.label}
-                        className={`style-thumb${styleId === st.id ? " active" : ""}`}
-                        onClick={() => setStyleId(st.id)}
-                        title={st.label}
-                      />
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {STYLE_LABELS.map((label, i) => (
+                      <div
+                        key={i}
+                        onClick={() => setStyleId(i)}
+                        style={{
+                          width: 52, height: 52, borderRadius: 6, cursor: "pointer",
+                          border: styleId === i ? "2px solid #1a56db" : "2px solid #e5e7eb",
+                          background: `hsl(${i * 40}, 60%, 92%)`,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: "0.6rem", fontWeight: 700, color: "#374151", textAlign: "center",
+                          transition: "border-color 0.15s",
+                        }}
+                      >
+                        {label}
+                      </div>
                     ))}
                   </div>
                   <div className="field-hint">Выберите стиль для своего дизайна</div>
@@ -284,12 +396,8 @@ export default function Index() {
                 <div style={{ marginBottom: 16 }}>
                   <div className="field-label">Формат даты <span className="req">*</span></div>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                    <button className={`date-fmt-btn${dateFmt === "us" ? " active" : ""}`} onClick={() => setDateFmt("us")}>
-                      ММ.ДД.ГГГГ (США)
-                    </button>
-                    <button className={`date-fmt-btn${dateFmt === "eu" ? " active" : ""}`} onClick={() => setDateFmt("eu")}>
-                      ДД.ММ.ГГГГ (ЕС)
-                    </button>
+                    <button className={`date-fmt-btn${dateFmt === "us" ? " active" : ""}`} onClick={() => setDateFmt("us")}>ММ.ДД.ГГГГ (США)</button>
+                    <button className={`date-fmt-btn${dateFmt === "eu" ? " active" : ""}`} onClick={() => setDateFmt("eu")}>ДД.ММ.ГГГГ (ЕС)</button>
                   </div>
                 </div>
 
@@ -328,11 +436,8 @@ export default function Index() {
                         onClick={() => setColorScheme(cs.id)}
                         className="color-swatch"
                         style={{
-                          background: cs.colors.length === 1
-                            ? cs.colors[0]
-                            : `linear-gradient(135deg, ${cs.colors[0]} 50%, ${cs.colors[1] || cs.colors[0]} 50%)`,
+                          background: `linear-gradient(135deg, ${cs.c1} 50%, ${cs.c2} 50%)`,
                           border: colorScheme === cs.id ? "3px solid #1a56db" : "3px solid #e5e7eb",
-                          boxShadow: cs.colors[0] === "#ffffff" ? "inset 0 0 0 1px #d1d5db" : "none",
                         }}
                       />
                     ))}
@@ -342,24 +447,27 @@ export default function Index() {
 
                 {/* Livery */}
                 <div style={{ marginBottom: 16 }}>
-                  <div className="field-label">Тип конской униформы <span className="req">*</span></div>
+                  <div className="field-label">Тип ливреи <span className="req">*</span></div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                     {Array.from({ length: 10 }, (_, i) => (
                       <div
                         key={i}
                         onClick={() => setLivery(i)}
-                        className={`livery-thumb`}
                         style={{
+                          width: 60, height: 44, borderRadius: 4, cursor: "pointer",
                           border: livery === i ? "2px solid #1a56db" : "2px solid #e5e7eb",
+                          background: `linear-gradient(${i * 36}deg, ${activeScheme.c1}, ${activeScheme.c2})`,
+                          transition: "border-color 0.15s",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: "0.65rem", fontWeight: 700, color: "#fff",
                         }}
                       >
-                        <img src={MAIN_IMAGE} alt={`livery-${i}`} style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.7 }} />
+                        #{i + 1}
                       </div>
                     ))}
                     <div
                       onClick={() => setLivery(10)}
-                      className="livery-thumb"
-                      style={{ border: livery === 10 ? "2px solid #1a56db" : "2px solid #e5e7eb", fontSize: "1.2rem", color: "#6b7280" }}
+                      style={{ width: 60, height: 44, borderRadius: 4, cursor: "pointer", border: livery === 10 ? "2px solid #1a56db" : "2px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem", color: "#6b7280", background: "#f9fafb" }}
                     >
                       •••
                     </div>
@@ -462,19 +570,15 @@ export default function Index() {
               </div>
             </div>
 
-            {/* Quantity + buttons */}
+            {/* Qty + buttons */}
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
               <button className="qty-btn" onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
-              <span style={{ minWidth: 32, textAlign: "center", fontWeight: 600, fontSize: "1rem" }}>{qty}</span>
+              <span style={{ minWidth: 32, textAlign: "center", fontWeight: 600 }}>{qty}</span>
               <button className="qty-btn" onClick={() => setQty((q) => q + 1)}>+</button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
-              <button className="btn-add-cart" onClick={handleAddToCart}>
-                ДОБАВИТЬ В КОРЗИНУ
-              </button>
-              <button className="btn-buy-now">
-                КУПИТЬ СЕЙЧАС
-              </button>
+              <button className="btn-add-cart" onClick={handleAddToCart}>ДОБАВИТЬ В КОРЗИНУ</button>
+              <button className="btn-buy-now">КУПИТЬ СЕЙЧАС</button>
             </div>
 
             {cartMsg && (
@@ -483,12 +587,11 @@ export default function Index() {
               </div>
             )}
 
-            {/* Share */}
-            <button style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.8rem", color: "#6b7280", background: "none", border: "none", cursor: "pointer", padding: "4px 0" }}>
+            <button style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.8rem", color: "#6b7280", background: "none", border: "none", cursor: "pointer" }}>
               <Icon name="Share2" size={14} /> Поделиться
             </button>
 
-            {/* Description accordion */}
+            {/* Description */}
             <button className="section-toggle" onClick={() => setDescOpen(!descOpen)}>
               <span>ОПИСАНИЕ</span>
               <Icon name={descOpen ? "ChevronUp" : "ChevronDown"} size={18} />
@@ -499,29 +602,24 @@ export default function Index() {
                   Создайте по-настоящему персонализированную футболку, указав каждую деталь: имена пилота и инструктора, модель самолёта, схему окраски, код аэропорта ИКАО и дату полёта — превратив этот незабываемый момент в вещь, которую вы сможете носить долгие годы.
                 </p>
                 <p style={{ marginBottom: 10 }}>
-                  Если вы не видите свой самолёт или схему окраски, просто выберите «Другое (три точки…)», загрузите фотографию, и наш художник перерисует её в нашем фирменном стиле — мы изготовим для вас уникальную футболку на заказ.
+                  Если вы не видите свой самолёт или схему окраски, просто выберите «Другое (три точки…)», загрузите фотографию, и наш художник перерисует её в нашем фирменном стиле.
                 </p>
-                <p style={{ marginBottom: 6, fontWeight: 700 }}>✦ Премиум качество — Сделано в США</p>
-                <p style={{ marginBottom: 6 }}>
-                  Эта лёгкая футболка весом 4,2 унции, изготовленная из исключительно мягкого 100% чёсаного и кольцевого хлопка <em>Airlume</em>, обеспечивает комфорт в течение всего дня и приятные тактильные ощущения.
-                </p>
-                <p>
-                  Печать выполнена с использованием высококачественной технологии DTG, что гарантирует чёткость, яркость и долговечность.
-                </p>
+                <p style={{ fontWeight: 700, marginBottom: 6 }}>✦ Премиум качество — Сделано в США</p>
+                <p>Лёгкая футболка 4,2 унции из 100% чёсаного кольцевого хлопка Airlume. Печать DTG — чёткость и долговечность.</p>
               </div>
             )}
 
-            {/* Shipping accordion */}
+            {/* Shipping */}
             <button className="section-toggle" onClick={() => setShippingOpen(!shippingOpen)}>
               <span>ДОСТАВКА И ВОЗВРАТ</span>
               <Icon name={shippingOpen ? "ChevronUp" : "ChevronDown"} size={18} />
             </button>
             {shippingOpen && (
               <div style={{ fontSize: "0.85rem", lineHeight: 1.75, color: "#374151", paddingBottom: 16 }}>
-                <p style={{ marginBottom: 8 }}>🚚 <strong>Бесплатная доставка</strong> по США при заказе от $50</p>
-                <p style={{ marginBottom: 8 }}>📦 Срок изготовления: 3–5 рабочих дней</p>
-                <p style={{ marginBottom: 8 }}>✈️ Доставка: 5–10 рабочих дней</p>
-                <p>↩ Возврат в течение 30 дней при наличии брака производителя. Персонализированные товары возврату не подлежат.</p>
+                <p>🚚 Бесплатная доставка по США от $50</p>
+                <p>📦 Изготовление: 3–5 рабочих дней</p>
+                <p>✈️ Доставка: 5–10 рабочих дней</p>
+                <p>↩ Возврат 30 дней при браке. Персонализированные товары возврату не подлежат.</p>
               </div>
             )}
           </div>
@@ -532,12 +630,8 @@ export default function Index() {
       <footer style={{ borderTop: "1px solid #e5e7eb", background: "#f9fafb", padding: "32px 24px" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 24 }}>
           <div>
-            <div style={{ fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", color: "#1e3a5f", marginBottom: 12, letterSpacing: "0.05em" }}>
-              DUSTY FLYER
-            </div>
-            <p style={{ fontSize: "0.8rem", color: "#6b7280", maxWidth: 240, lineHeight: 1.6 }}>
-              Авиационные подарки и одежда для пилотов и любителей авиации.
-            </p>
+            <div style={{ fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", color: "#1e3a5f", marginBottom: 12 }}>DUSTY FLYER</div>
+            <p style={{ fontSize: "0.8rem", color: "#6b7280", maxWidth: 240, lineHeight: 1.6 }}>Авиационные подарки и одежда для пилотов и любителей авиации.</p>
           </div>
           <div style={{ display: "flex", gap: 48, flexWrap: "wrap" }}>
             {[
@@ -545,15 +639,13 @@ export default function Index() {
               { title: "Помощь", links: ["Доставка", "Возврат", "Контакты"] },
             ].map((col) => (
               <div key={col.title}>
-                <div style={{ fontWeight: 700, fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10, color: "#374151" }}>{col.title}</div>
-                {col.links.map((l) => (
-                  <div key={l} style={{ fontSize: "0.8rem", color: "#6b7280", marginBottom: 6, cursor: "pointer" }}>{l}</div>
-                ))}
+                <div style={{ fontWeight: 700, fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>{col.title}</div>
+                {col.links.map((l) => <div key={l} style={{ fontSize: "0.8rem", color: "#6b7280", marginBottom: 6, cursor: "pointer" }}>{l}</div>)}
               </div>
             ))}
           </div>
         </div>
-        <div style={{ maxWidth: 1280, margin: "24px auto 0", borderTop: "1px solid #e5e7eb", paddingTop: 16, fontSize: "0.75rem", color: "#9ca3af", textAlign: "center" }}>
+        <div style={{ maxWidth: 1280, margin: "20px auto 0", borderTop: "1px solid #e5e7eb", paddingTop: 16, fontSize: "0.75rem", color: "#9ca3af", textAlign: "center" }}>
           © 2026 Dusty Flyer. Все права защищены.
         </div>
       </footer>
