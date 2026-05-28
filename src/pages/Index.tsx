@@ -1,649 +1,560 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
 
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "URBAN GRAPHIC TEE",
-    price: 3490,
-    oldPrice: 4990,
-    image: "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/bcf6bd8e-cc86-420b-8f1c-af46415455f0.jpg",
-    tag: "HIT",
-    tagColor: "#FF3B3B",
-    sizes: ["XS", "S", "M", "L", "XL"],
-    description: "Оверсайз-футболка с ярким урбан-принтом. 100% хлопок.",
-    category: "tee",
-  },
-  {
-    id: 2,
-    name: "NEON HOODIE DROP",
-    price: 6990,
-    oldPrice: null,
-    image: "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/6daebb63-7b43-4bbe-907b-6ec1f1b928a6.jpg",
-    tag: "NEW",
-    tagColor: "#FFD700",
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    description: "Толстовка оверсайз с неоновым принтом. Начёс внутри.",
-    category: "hoodie",
-  },
-  {
-    id: 3,
-    name: "CARGO FLEX PANTS",
-    price: 5490,
-    oldPrice: 7200,
-    image: "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/5b5c5432-0ec8-4dfd-88ae-ca05043e0407.jpg",
-    tag: "SALE",
-    tagColor: "#FF3B3B",
-    sizes: ["XS", "S", "M", "L"],
-    description: "Карго-штаны с геометричным узором. Эластичный пояс.",
-    category: "pants",
-  },
-  {
-    id: 4,
-    name: "GEOMETRIC JACKET",
-    price: 9990,
-    oldPrice: null,
-    image: "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/f89f3a98-8dc4-48bf-b4f8-2b95e4baa3ee.jpg",
-    tag: "DROP",
-    tagColor: "#FFD700",
-    sizes: ["S", "M", "L", "XL"],
-    description: "Куртка с геометрическим паттерном. Лимитированная коллекция.",
-    category: "jacket",
-  },
+const MAIN_IMAGE = "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/ef13f638-e2ae-4db8-8eab-f9f45eb49e81.jpg";
+const LIFESTYLE_IMAGE = "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/b4467fc6-d5a1-4022-9902-f972e4b31236.jpg";
+
+const THUMBS = [
+  { id: 0, src: MAIN_IMAGE, label: "Flat lay" },
+  { id: 1, src: "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/bcf6bd8e-cc86-420b-8f1c-af46415455f0.jpg", label: "Print close" },
+  { id: 2, src: LIFESTYLE_IMAGE, label: "Lifestyle" },
+  { id: 3, src: "https://cdn.poehali.dev/projects/9efec3ac-78fb-43c5-ac13-9d68b82bd856/files/6daebb63-7b43-4bbe-907b-6ec1f1b928a6.jpg", label: "Interior" },
 ];
 
-type CartItem = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  size: string;
-  qty: number;
-};
+const SIZES = ["С", "М", "Л", "XL", "XXL", "XXXL"];
 
-type Page = "catalog" | "contacts" | "checkout";
+const PLANES = [
+  "Cessna 172", "Cessna 152", "Piper PA-28", "Beechcraft Bonanza",
+  "Cirrus SR22", "Diamond DA40", "Mooney M20", "Другое (три точки…)",
+];
+
+const COLOR_SCHEMES = [
+  { id: "red-blue",    colors: ["#b91c1c", "#1d4ed8"] },
+  { id: "navy-gold",   colors: ["#1e3a5f", "#c8a731"] },
+  { id: "teal-slate",  colors: ["#0f766e", "#475569"] },
+  { id: "pink-purple", colors: ["#db2777", "#7c3aed"] },
+  { id: "white",       colors: ["#ffffff"] },
+  { id: "navy-red",    colors: ["#1e3a5f", "#b91c1c"] },
+  { id: "rose-navy",   colors: ["#e11d48", "#1e3a5f"] },
+  { id: "navy-khaki",  colors: ["#1e3a5f", "#78716c"] },
+  { id: "slate-navy",  colors: ["#475569", "#1e3a5f"] },
+  { id: "crossed",     colors: ["#b91c1c", "#1e3a5f", "diagonal"] },
+];
+
+const TAIL_COLORS = [
+  "#ffffff", "#111827", "#b91c1c", "#db2777", "#f59e0b",
+  "#92400e", "#f97316", "#1d4ed8", "#06b6d4", "#0f766e",
+];
+
+const STYLE_THUMBS = [
+  { id: 0, label: "Классик" },
+  { id: 1, label: "Ретро" },
+  { id: 2, label: "Боулд" },
+  { id: 3, label: "Минимал" },
+  { id: 4, label: "Нео" },
+];
+
+const LIVERY_ROWS = [
+  [0, 1, 2, 3, 4],
+  [5, 6, 7, 8, 9],
+  ["more"],
+];
 
 export default function Index() {
-  const [page, setPage] = useState<Page>("catalog");
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [cartOpen, setCartOpen] = useState(false);
-  const [selectedSizes, setSelectedSizes] = useState<Record<number, string>>({});
-  const [orderDone, setOrderDone] = useState(false);
-  const [form, setForm] = useState({ name: "", phone: "", email: "", address: "", comment: "" });
-  const [filter, setFilter] = useState("all");
+  const [activeThumb, setActiveThumb] = useState(0);
+  const [size, setSize] = useState("М");
+  const [styleId, setStyleId] = useState(0);
+  const [dateFmt, setDateFmt] = useState("us");
+  const [soloDate, setSoloDate] = useState("");
+  const [plane, setPlane] = useState("Cessna 172");
+  const [colorScheme, setColorScheme] = useState("red-blue");
+  const [livery, setLivery] = useState(0);
+  const [tailNum, setTailNum] = useState("N75200");
+  const [tailColor, setTailColor] = useState("#111827");
+  const [studentName, setStudentName] = useState("");
+  const [cfiName, setCfiName] = useState("");
+  const [airport, setAirport] = useState("");
+  const [agreed, setAgreed] = useState(false);
+  const [qty, setQty] = useState(1);
+  const [descOpen, setDescOpen] = useState(true);
+  const [shippingOpen, setShippingOpen] = useState(false);
+  const [cartMsg, setCartMsg] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const totalQty = cart.reduce((s, i) => s + i.qty, 0);
-  const totalPrice = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const PRICE = 34.80;
+  const OLD_PRICE = 43.00;
+  const DISCOUNT = Math.round(100 - (PRICE / OLD_PRICE) * 100);
 
-  const addToCart = (product: typeof PRODUCTS[0]) => {
-    const size = selectedSizes[product.id] || product.sizes[2];
-    setCart((prev) => {
-      const existing = prev.find((i) => i.id === product.id && i.size === size);
-      if (existing) return prev.map((i) => i.id === product.id && i.size === size ? { ...i, qty: i.qty + 1 } : i);
-      return [...prev, { id: product.id, name: product.name, price: product.price, image: product.image, size, qty: 1 }];
-    });
-    setCartOpen(true);
-  };
-
-  const removeFromCart = (id: number, size: string) => {
-    setCart((prev) => prev.filter((i) => !(i.id === id && i.size === size)));
-  };
-
-  const changeQty = (id: number, size: string, delta: number) => {
-    setCart((prev) =>
-      prev.map((i) => i.id === id && i.size === size ? { ...i, qty: Math.max(1, i.qty + delta) } : i)
-    );
-  };
-
-  const filteredProducts = filter === "all" ? PRODUCTS : PRODUCTS.filter((p) => p.category === filter);
-
-  const handleOrder = (e: React.FormEvent) => {
-    e.preventDefault();
-    setOrderDone(true);
-    setCart([]);
-  };
-
-  const navLinks: { label: string; key: Page }[] = [
-    { label: "КАТАЛОГ", key: "catalog" },
-    { label: "КОНТАКТЫ", key: "contacts" },
-  ];
+  function handleAddToCart() {
+    setCartMsg(true);
+    setTimeout(() => setCartMsg(false), 3000);
+  }
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--dark)", color: "#F5F5F5" }}>
+    <div style={{ minHeight: "100vh", background: "#fff", color: "#111827" }}>
 
-      {/* NAVBAR */}
-      <nav
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
-        style={{ background: "var(--dark)", borderBottom: "1px solid #1E1E1E" }}
-      >
-        <button
-          onClick={() => setPage("catalog")}
-          style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.5rem", color: "var(--neon)", letterSpacing: "0.05em" }}
-        >
-          DRIP<span style={{ color: "#F5F5F5" }}>STORE</span>
-        </button>
-
-        <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((l) => (
-            <button
-              key={l.key}
-              onClick={() => setPage(l.key)}
-              style={{
-                fontFamily: "'Bebas Neue', sans-serif",
-                fontSize: "1rem",
-                letterSpacing: "0.1em",
-                color: page === l.key ? "var(--neon)" : "#999",
-              }}
-            >
-              {l.label}
-            </button>
-          ))}
-        </div>
-
-        <button
-          onClick={() => setCartOpen(true)}
-          className="relative flex items-center gap-2 px-4 py-2 transition-all"
-          style={{ border: "1px solid #333", color: "#F5F5F5" }}
-        >
-          <Icon name="ShoppingBag" size={18} />
-          <span style={{ fontFamily: "'Manrope', sans-serif", fontSize: "0.85rem", fontWeight: 700 }}>
-            Корзина
-          </span>
-          {totalQty > 0 && (
-            <span
-              className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center text-xs font-black"
-              style={{ background: "var(--neon)", color: "#0D0D0D", borderRadius: "50%" }}
-            >
-              {totalQty}
-            </span>
-          )}
-        </button>
-      </nav>
-
-      {/* MARQUEE BANNER */}
-      <div
-        className="overflow-hidden py-2 mt-[65px]"
-        style={{ background: "var(--neon)", color: "#0D0D0D" }}
-      >
-        <div className="marquee-track">
-          {[...Array(6)].map((_, i) => (
-            <span
-              key={i}
-              style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "0.85rem", letterSpacing: "0.15em", padding: "0 24px" }}
-            >
-              НОВАЯ КОЛЛЕКЦИЯ &nbsp;★&nbsp; FREE ДОСТАВКА ОТ 5000₽ &nbsp;★&nbsp; STREETWEAR DROP 2026 &nbsp;★&nbsp; BOLD IS THE NEW NORMAL &nbsp;★&nbsp;
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* CART OVERLAY */}
-      <div className={`cart-overlay ${cartOpen ? "open" : ""}`} onClick={() => setCartOpen(false)} />
-
-      {/* CART SIDEBAR */}
-      <div className={`cart-sidebar ${cartOpen ? "open" : ""}`}>
-        <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: "1px solid #222" }}>
-          <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.5rem", letterSpacing: "0.05em" }}>
-            КОРЗИНА {totalQty > 0 && <span style={{ color: "var(--neon)" }}>({totalQty})</span>}
-          </span>
-          <button onClick={() => setCartOpen(false)}>
-            <Icon name="X" size={22} />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-          {cart.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full gap-4" style={{ opacity: 0.4 }}>
-              <Icon name="ShoppingBag" size={48} />
-              <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1rem", letterSpacing: "0.1em" }}>
-                КОРЗИНА ПУСТА
-              </p>
-            </div>
-          ) : (
-            cart.map((item) => (
-              <div key={`${item.id}-${item.size}`} className="flex gap-3" style={{ borderBottom: "1px solid #1E1E1E", paddingBottom: "16px" }}>
-                <img src={item.image} alt={item.name} className="w-20 h-24 object-cover flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1rem", letterSpacing: "0.05em" }}>{item.name}</div>
-                  <div className="text-xs mt-1" style={{ color: "#666" }}>Размер: <span style={{ color: "var(--neon)" }}>{item.size}</span></div>
-                  <div className="flex items-center justify-between mt-3">
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => changeQty(item.id, item.size, -1)} className="w-6 h-6 flex items-center justify-center text-sm" style={{ border: "1px solid #333" }}>−</button>
-                      <span className="text-sm font-bold w-4 text-center">{item.qty}</span>
-                      <button onClick={() => changeQty(item.id, item.size, 1)} className="w-6 h-6 flex items-center justify-center text-sm" style={{ border: "1px solid #333" }}>+</button>
-                    </div>
-                    <span className="font-black text-sm">{(item.price * item.qty).toLocaleString("ru")} ₽</span>
-                  </div>
-                </div>
-                <button onClick={() => removeFromCart(item.id, item.size)} className="self-start mt-1" style={{ opacity: 0.3 }}>
-                  <Icon name="Trash2" size={16} />
-                </button>
+      {/* HEADER */}
+      <header style={{ borderBottom: "1px solid #e5e7eb", background: "#fff", position: "sticky", top: 0, zIndex: 50 }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
+            {/* Logo */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+              <div style={{
+                width: 48, height: 48,
+                background: "#1e3a5f",
+                borderRadius: "50%",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: "#fff", fontWeight: 900, fontSize: "0.65rem", textAlign: "center", lineHeight: 1.2,
+                letterSpacing: "0.02em"
+              }}>
+                DUSTY<br/>FLYER
               </div>
-            ))
-          )}
-        </div>
-
-        {cart.length > 0 && (
-          <div className="px-6 py-5" style={{ borderTop: "1px solid #222" }}>
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-sm font-bold" style={{ color: "#999" }}>ИТОГО</span>
-              <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.5rem" }}>{totalPrice.toLocaleString("ru")} ₽</span>
+              <span style={{ fontWeight: 900, fontSize: "0.85rem", letterSpacing: "0.05em", textTransform: "uppercase", color: "#1e3a5f" }}>
+                Dusty Flyer
+              </span>
             </div>
-            <button
-              className="btn-neon"
-              onClick={() => { setCartOpen(false); setPage("checkout"); }}
-              style={{ width: "100%", clipPath: "none" }}
-            >
-              ОФОРМИТЬ ЗАКАЗ
-            </button>
+
+            {/* Nav desktop */}
+            <nav style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }} className="hidden md:flex">
+              {["Дом", "Америка250", "Футболки на заказ", "Декор для стен", "Футболки ▾", "О ▾"].map((item) => (
+                <span key={item} className="nav-link" style={{ fontSize: "0.82rem", whiteSpace: "nowrap" }}>{item}</span>
+              ))}
+              <span className="nav-link" style={{ fontSize: "0.82rem" }}>Посмотреть все</span>
+            </nav>
+
+            {/* Right */}
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{ fontSize: "0.75rem", color: "#6b7280", textAlign: "right", lineHeight: 1.4 }} className="hidden md:block">
+                Соединённые Штаты | USD $
+              </div>
+              <Icon name="Search" size={20} style={{ color: "#374151", cursor: "pointer" }} />
+              <Icon name="User" size={20} style={{ color: "#374151", cursor: "pointer" }} />
+              <Icon name="ShoppingCart" size={20} style={{ color: "#374151", cursor: "pointer" }} />
+              <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
+                <Icon name="Menu" size={22} />
+              </button>
+            </div>
+          </div>
+        </div>
+        {/* Mobile nav */}
+        {menuOpen && (
+          <div style={{ borderTop: "1px solid #e5e7eb", padding: "12px 24px", background: "#fff" }}>
+            {["Дом", "Америка250", "Футболки на заказ", "Декор для стен", "Футболки", "О нас", "Посмотреть все"].map((item) => (
+              <div key={item} style={{ padding: "8px 0", fontSize: "0.875rem", color: "#374151", cursor: "pointer", borderBottom: "1px solid #f3f4f6" }}>{item}</div>
+            ))}
           </div>
         )}
+      </header>
+
+      {/* BREADCRUMB */}
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "10px 24px", fontSize: "0.75rem", color: "#9ca3af" }}>
+        <span className="nav-link">flicker.com</span>
       </div>
 
-      {/* CATALOG PAGE */}
-      {page === "catalog" && (
-        <div>
-          {/* HERO */}
-          <section className="relative overflow-hidden" style={{ minHeight: "75vh", display: "flex", alignItems: "center" }}>
-            <div
-              className="absolute inset-0 -z-10"
-              style={{ background: "linear-gradient(135deg, #0D0D0D 0%, #141414 50%, #1a1200 100%)" }}
-            />
-            <div
-              className="absolute top-0 right-0 w-1/2 h-full -z-10"
-              style={{ background: "radial-gradient(ellipse at right, rgba(255,215,0,0.12) 0%, transparent 70%)" }}
-            />
-            <div className="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center py-20">
-              <div>
+      {/* PRODUCT */}
+      <main style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px 60px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}
+             className="block md:grid">
+
+          {/* LEFT: Gallery */}
+          <div>
+            {/* Main image */}
+            <div style={{ position: "relative", background: "#f9fafb", borderRadius: 8, overflow: "hidden", marginBottom: 12 }}>
+              <img
+                src={THUMBS[activeThumb].src}
+                alt="product"
+                style={{ width: "100%", aspectRatio: "1/1", objectFit: "cover", display: "block" }}
+              />
+              <button
+                onClick={() => setActiveThumb((p) => Math.max(0, p - 1))}
+                style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.9)", border: "1px solid #e5e7eb", borderRadius: "50%", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+              >
+                <Icon name="ChevronLeft" size={18} />
+              </button>
+              <button
+                onClick={() => setActiveThumb((p) => Math.min(THUMBS.length - 1, p + 1))}
+                style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "rgba(255,255,255,0.9)", border: "1px solid #e5e7eb", borderRadius: "50%", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+              >
+                <Icon name="ChevronRight" size={18} />
+              </button>
+            </div>
+            {/* Thumbnails */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
+              {THUMBS.map((t) => (
                 <div
-                  className="inline-block mb-4 px-4 py-1 text-xs font-black tracking-widest"
-                  style={{ background: "#FF3B3B", color: "#fff", fontFamily: "'Bebas Neue', sans-serif", letterSpacing: "0.15em" }}
-                >
-                  ★ SPRING DROP 2026
-                </div>
-                <h1
+                  key={t.id}
+                  onClick={() => setActiveThumb(t.id)}
                   style={{
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    fontSize: "clamp(4rem, 10vw, 8rem)",
-                    lineHeight: 0.9,
-                    letterSpacing: "0.02em",
+                    borderRadius: 6, overflow: "hidden", cursor: "pointer", aspectRatio: "1/1",
+                    border: activeThumb === t.id ? "2px solid #1a56db" : "2px solid #e5e7eb",
+                    transition: "border-color 0.15s"
                   }}
                 >
-                  БУДЬ<br />
-                  <span style={{ color: "var(--neon)" }}>ВНЕ</span><br />
-                  ПРАВИЛ
-                </h1>
-                <p className="mt-6 text-base" style={{ color: "#888", maxWidth: "360px", lineHeight: 1.7 }}>
-                  Streetwear для тех, кто задаёт тренды. Лимитированные дропы каждую неделю.
-                </p>
-                <div className="flex gap-4 mt-8 flex-wrap">
-                  <button
-                    className="btn-neon"
-                    onClick={() => document.getElementById("catalog-section")?.scrollIntoView({ behavior: "smooth" })}
-                  >
-                    СМОТРЕТЬ КОЛЛЕКЦИЮ
-                  </button>
-                </div>
-              </div>
-              <div className="relative hidden md:block">
-                <img
-                  src={PRODUCTS[1].image}
-                  alt="hero"
-                  className="w-full object-cover"
-                  style={{ maxHeight: "500px", objectPosition: "top", filter: "contrast(1.05) saturate(1.1)" }}
-                />
-                <div
-                  className="absolute bottom-4 left-4 px-4 py-3"
-                  style={{ background: "var(--neon)", color: "#0D0D0D" }}
-                >
-                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.2rem" }}>NEON HOODIE DROP</div>
-                  <div className="text-sm font-black">6 990 ₽</div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* STATS */}
-          <section style={{ background: "var(--surface)", borderTop: "1px solid #1E1E1E", borderBottom: "1px solid #1E1E1E" }}>
-            <div className="container mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              {[
-                { num: "10K+", label: "клиентов" },
-                { num: "200+", label: "уникальных принтов" },
-                { num: "48ч", label: "доставка" },
-                { num: "100%", label: "авторский дизайн" },
-              ].map((s) => (
-                <div key={s.label}>
-                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "2.5rem", color: "var(--neon)" }}>{s.num}</div>
-                  <div className="text-xs font-semibold tracking-widest uppercase" style={{ color: "#666" }}>{s.label}</div>
+                  <img src={t.src} alt={t.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
               ))}
             </div>
-          </section>
+          </div>
 
-          {/* CATALOG */}
-          <section id="catalog-section" className="container mx-auto px-6 py-16">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
-              <div>
-                <div className="text-xs font-black tracking-widest mb-2" style={{ color: "var(--neon)", fontFamily: "'Bebas Neue', sans-serif" }}>— КАТАЛОГ</div>
-                <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "3.5rem", lineHeight: 1 }}>
-                  ВСЯ КОЛЛЕКЦИЯ
-                </h2>
+          {/* RIGHT: Product info */}
+          <div style={{ paddingTop: 4 }}>
+            {/* Title */}
+            <h1 style={{ fontSize: "1.6rem", fontWeight: 700, lineHeight: 1.3, marginBottom: 12, color: "#111827" }}>
+              Футболка «Первый пилот-одиночка» (с персонализацией)
+            </h1>
+
+            {/* Tax/shipping */}
+            <p style={{ fontSize: "0.78rem", color: "#6b7280", marginBottom: 10 }}>
+              Налоги включены.{" "}
+              <span style={{ textDecoration: "underline", cursor: "pointer" }}>Стоимость доставки</span>{" "}
+              рассчитывается при оформлении заказа.
+            </p>
+
+            {/* Shop Pay */}
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14, fontSize: "0.78rem", color: "#6b7280" }}>
+              <span>Оплата в рассрочку для заказов свыше</span>
+              <strong style={{ color: "#5a31f4" }}>35,00 $</strong>
+              <span>с</span>
+              <span style={{ background: "#5a31f4", color: "#fff", borderRadius: 3, padding: "1px 6px", fontWeight: 700, fontSize: "0.7rem" }}>shop</span>
+              <span style={{ color: "#5a31f4", fontWeight: 600 }}>Pay</span>
+              <span style={{ color: "#5a31f4", textDecoration: "underline", cursor: "pointer" }}>Узнать больше</span>
+            </div>
+
+            {/* Price */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+              <span style={{ fontSize: "1.5rem", fontWeight: 700, color: "#b91c1c" }}>
+                {PRICE.toFixed(2)} долларов США
+              </span>
+              <span style={{ fontSize: "0.95rem", color: "#9ca3af", textDecoration: "line-through" }}>
+                {OLD_PRICE.toFixed(2)} долларов США
+              </span>
+              <span className="discount-badge">Экономия {DISCOUNT}%</span>
+            </div>
+
+            {/* Available products */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.05em", color: "#374151", marginBottom: 8, textTransform: "uppercase" }}>
+                Доступные товары
               </div>
-              <div className="flex gap-2 flex-wrap">
-                {[
-                  { key: "all", label: "ВСЁ" },
-                  { key: "tee", label: "ФУТБОЛКИ" },
-                  { key: "hoodie", label: "ХУДИ" },
-                  { key: "pants", label: "ШТАНЫ" },
-                  { key: "jacket", label: "КУРТКИ" },
-                ].map((f) => (
+              <select
+                className="form-input"
+                style={{ maxWidth: 320 }}
+                defaultValue="premium"
+              >
+                <option value="premium">Футболка (премиум-класса, унис…</option>
+                <option value="hoodie">Худи (премиум-класса)</option>
+                <option value="long">Лонгслив</option>
+              </select>
+            </div>
+
+            {/* Size */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.05em", color: "#374151", marginBottom: 8, textTransform: "uppercase" }}>
+                Размер
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {SIZES.map((s) => (
                   <button
-                    key={f.key}
-                    onClick={() => setFilter(f.key)}
-                    className="size-btn"
-                    style={filter === f.key ? { borderColor: "var(--neon)", color: "var(--neon)", background: "rgba(255,215,0,0.08)" } : {}}
+                    key={s}
+                    onClick={() => setSize(s)}
+                    className={`size-pill${size === s ? " active" : ""}`}
                   >
-                    {f.label}
+                    {s}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {filteredProducts.map((product) => (
-                <div key={product.id} className="product-card">
-                  <div className="relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                    />
-                    <div
-                      className="card-overlay absolute inset-0 flex items-end justify-center pb-4"
-                      style={{ background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)" }}
-                    >
-                      <button
-                        className="btn-neon text-sm"
-                        style={{ clipPath: "none" }}
-                        onClick={() => addToCart(product)}
-                      >
-                        В КОРЗИНУ
-                      </button>
-                    </div>
-                    <div
-                      className="absolute top-3 left-3 tag-badge font-black"
-                      style={{
-                        background: product.tagColor,
-                        color: product.tagColor === "#FFD700" ? "#0D0D0D" : "#fff",
-                        fontFamily: "'Bebas Neue', sans-serif",
-                        fontSize: "0.75rem",
-                        letterSpacing: "0.1em",
-                        padding: "2px 10px",
-                      }}
-                    >
-                      {product.tag}
-                    </div>
+            {/* PERSONALIZE */}
+            <div style={{ border: "1px solid #e5e7eb", borderRadius: 6, overflow: "hidden", marginBottom: 20 }}>
+              <div style={{ background: "#f9fafb", padding: "14px 16px", fontWeight: 700, fontSize: "0.85rem", letterSpacing: "0.05em", textAlign: "center", textTransform: "uppercase", color: "#111827", borderBottom: "1px solid #e5e7eb" }}>
+                Персонализировать
+              </div>
+              <div style={{ padding: "16px" }}>
+
+                {/* Style */}
+                <div style={{ marginBottom: 16 }}>
+                  <div className="field-label">Стиль дизайна <span className="req">*</span></div>
+                  <div className="thumb-grid">
+                    {STYLE_THUMBS.map((st) => (
+                      <img
+                        key={st.id}
+                        src={MAIN_IMAGE}
+                        alt={st.label}
+                        className={`style-thumb${styleId === st.id ? " active" : ""}`}
+                        onClick={() => setStyleId(st.id)}
+                        title={st.label}
+                      />
+                    ))}
                   </div>
-                  <div className="p-4">
-                    <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.15rem", letterSpacing: "0.05em" }}>
-                      {product.name}
-                    </div>
-                    <p className="text-xs mt-1 mb-3" style={{ color: "#666", lineHeight: 1.5 }}>{product.description}</p>
+                  <div className="field-hint">Выберите стиль для своего дизайна</div>
+                </div>
 
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {product.sizes.map((size) => (
-                        <button
-                          key={size}
-                          className="size-btn"
-                          style={(selectedSizes[product.id] || product.sizes[2]) === size
-                            ? { borderColor: "var(--neon)", color: "var(--neon)" }
-                            : {}}
-                          onClick={() => setSelectedSizes((prev) => ({ ...prev, [product.id]: size }))}
-                        >
-                          {size}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="font-black text-lg">{product.price.toLocaleString("ru")} ₽</span>
-                        {product.oldPrice && (
-                          <span className="text-xs line-through ml-2" style={{ color: "#555" }}>
-                            {product.oldPrice.toLocaleString("ru")} ₽
-                          </span>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => addToCart(product)}
-                        className="flex items-center gap-1 text-sm font-bold"
-                        style={{ color: "var(--neon)" }}
-                      >
-                        <Icon name="Plus" size={18} />
-                      </button>
-                    </div>
+                {/* Date format */}
+                <div style={{ marginBottom: 16 }}>
+                  <div className="field-label">Формат даты <span className="req">*</span></div>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <button className={`date-fmt-btn${dateFmt === "us" ? " active" : ""}`} onClick={() => setDateFmt("us")}>
+                      ММ.ДД.ГГГГ (США)
+                    </button>
+                    <button className={`date-fmt-btn${dateFmt === "eu" ? " active" : ""}`} onClick={() => setDateFmt("eu")}>
+                      ДД.ММ.ГГГГ (ЕС)
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
 
-          {/* CTA BANNER */}
-          <section className="mx-6 mb-16 py-16 px-8 relative overflow-hidden" style={{ background: "var(--neon)" }}>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", color: "#0D0D0D", lineHeight: 1.1 }}>
-                БЕСПЛАТНАЯ ДОСТАВКА<br />
-                <span style={{ fontSize: "0.5em", letterSpacing: "0.2em" }}>ПРИ ЗАКАЗЕ ОТ 5 000 ₽</span>
-              </div>
-              <button
-                className="btn-outline flex-shrink-0"
-                style={{ borderColor: "#0D0D0D", color: "#0D0D0D" }}
-                onClick={() => document.getElementById("catalog-section")?.scrollIntoView({ behavior: "smooth" })}
-              >
-                ВЫБРАТЬ ТОВАР
-              </button>
-            </div>
-          </section>
-        </div>
-      )}
-
-      {/* CONTACTS PAGE */}
-      {page === "contacts" && (
-        <div className="container mx-auto px-6 py-24 max-w-2xl">
-          <div className="text-xs font-black tracking-widest mb-2" style={{ color: "var(--neon)", fontFamily: "'Bebas Neue', sans-serif" }}>— КОНТАКТЫ</div>
-          <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "4rem", lineHeight: 1 }}>
-            СВЯЖИСЬ<br />С НАМИ
-          </h2>
-          <p className="mt-4 mb-12 text-sm" style={{ color: "#777", lineHeight: 1.8 }}>
-            Есть вопросы по заказу, размерам или коллаборации? Пиши — ответим быстро.
-          </p>
-
-          <div className="grid gap-4 mb-12">
-            {[
-              { icon: "Mail", label: "Email", value: "hello@dripstore.ru" },
-              { icon: "Phone", label: "Телефон", value: "+7 (999) 000-00-00" },
-              { icon: "MapPin", label: "Адрес", value: "Москва, ул. Арбат, 1" },
-              { icon: "Clock", label: "Режим работы", value: "Пн–Пт 10:00–19:00" },
-            ].map((c) => (
-              <div key={c.label} className="flex items-center gap-4 p-4" style={{ border: "1px solid #1E1E1E", background: "var(--surface)" }}>
-                <div className="w-10 h-10 flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,215,0,0.1)", color: "var(--neon)" }}>
-                  <Icon name={c.icon} size={20} />
-                </div>
-                <div>
-                  <div className="text-xs font-bold tracking-widest mb-0.5" style={{ color: "#555" }}>{c.label.toUpperCase()}</div>
-                  <div className="font-semibold text-sm">{c.value}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ borderTop: "1px solid #1E1E1E", paddingTop: "32px" }}>
-            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.5rem", marginBottom: "16px" }}>НАПИСАТЬ НАМ</div>
-            <form
-              onSubmit={(e) => { e.preventDefault(); alert("Сообщение отправлено! Мы свяжемся с вами."); }}
-              className="space-y-4"
-            >
-              <input
-                type="text"
-                placeholder="Ваше имя"
-                required
-                className="w-full px-4 py-3 text-sm outline-none"
-                style={{ background: "var(--surface2)", border: "1px solid #222", color: "#F5F5F5", fontFamily: "'Manrope', sans-serif" }}
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                required
-                className="w-full px-4 py-3 text-sm outline-none"
-                style={{ background: "var(--surface2)", border: "1px solid #222", color: "#F5F5F5", fontFamily: "'Manrope', sans-serif" }}
-              />
-              <textarea
-                placeholder="Ваше сообщение"
-                rows={4}
-                required
-                className="w-full px-4 py-3 text-sm outline-none resize-none"
-                style={{ background: "var(--surface2)", border: "1px solid #222", color: "#F5F5F5", fontFamily: "'Manrope', sans-serif" }}
-              />
-              <button type="submit" className="btn-neon" style={{ clipPath: "none" }}>
-                ОТПРАВИТЬ
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* CHECKOUT PAGE */}
-      {page === "checkout" && (
-        <div className="container mx-auto px-6 py-24 max-w-4xl">
-          {orderDone ? (
-            <div className="flex flex-col items-center justify-center text-center py-24 gap-6">
-              <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "5rem", color: "var(--neon)", lineHeight: 1 }}>
-                ГОТОВО!
-              </div>
-              <p className="text-sm" style={{ color: "#777", maxWidth: "400px", lineHeight: 1.8 }}>
-                Ваш заказ принят. Мы свяжемся с вами в ближайшее время для подтверждения.
-              </p>
-              <button className="btn-neon mt-4" style={{ clipPath: "none" }} onClick={() => { setOrderDone(false); setPage("catalog"); }}>
-                ВЕРНУТЬСЯ В МАГАЗИН
-              </button>
-            </div>
-          ) : (
-            <div>
-              <div className="text-xs font-black tracking-widest mb-2" style={{ color: "var(--neon)", fontFamily: "'Bebas Neue', sans-serif" }}>— ОФОРМЛЕНИЕ</div>
-              <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "4rem", lineHeight: 1, marginBottom: "32px" }}>
-                ВАШ ЗАКАЗ
-              </h2>
-
-              <div className="grid md:grid-cols-5 gap-8">
-                <form className="md:col-span-3 space-y-4" onSubmit={handleOrder}>
-                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.2rem", color: "#999", marginBottom: "8px", letterSpacing: "0.1em" }}>
-                    ДАННЫЕ ДЛЯ ДОСТАВКИ
-                  </div>
-                  {[
-                    { key: "name", placeholder: "Имя и фамилия", type: "text" },
-                    { key: "phone", placeholder: "Телефон", type: "tel" },
-                    { key: "email", placeholder: "Email", type: "email" },
-                    { key: "address", placeholder: "Адрес доставки (город, улица, дом)", type: "text" },
-                  ].map((f) => (
-                    <input
-                      key={f.key}
-                      type={f.type}
-                      placeholder={f.placeholder}
-                      required
-                      value={form[f.key as keyof typeof form]}
-                      onChange={(e) => setForm((prev) => ({ ...prev, [f.key]: e.target.value }))}
-                      className="w-full px-4 py-3 text-sm outline-none"
-                      style={{ background: "var(--surface)", border: "1px solid #222", color: "#F5F5F5", fontFamily: "'Manrope', sans-serif" }}
-                    />
-                  ))}
-                  <textarea
-                    placeholder="Комментарий к заказу (необязательно)"
-                    rows={3}
-                    value={form.comment}
-                    onChange={(e) => setForm((prev) => ({ ...prev, comment: e.target.value }))}
-                    className="w-full px-4 py-3 text-sm outline-none resize-none"
-                    style={{ background: "var(--surface)", border: "1px solid #222", color: "#F5F5F5", fontFamily: "'Manrope', sans-serif" }}
-                  />
-                  <button type="submit" className="btn-neon" style={{ clipPath: "none", width: "100%" }}>
-                    ПОДТВЕРДИТЬ ЗАКАЗ
-                  </button>
-                  <p className="text-xs text-center" style={{ color: "#444" }}>
-                    Нажимая кнопку, вы соглашаетесь с условиями обработки данных
+                {/* Solo date */}
+                <div style={{ marginBottom: 16 }}>
+                  <div className="field-label">Первое самостоятельное свидание <span className="req">*</span></div>
+                  <p style={{ fontSize: "0.78rem", color: "#9ca3af", marginBottom: 6, fontStyle: "italic" }}>
+                    {dateFmt === "us" ? "17.12.1903" : "12.17.1903"}
                   </p>
-                </form>
+                  <input
+                    type="date"
+                    className="form-input"
+                    value={soloDate}
+                    onChange={(e) => setSoloDate(e.target.value)}
+                    style={{ maxWidth: 200 }}
+                  />
+                  <div className="field-hint">Выберите своё первое свидание наедине.</div>
+                </div>
 
-                <div className="md:col-span-2">
-                  <div className="p-5" style={{ background: "var(--surface)", border: "1px solid #1E1E1E" }}>
-                    <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.2rem", color: "#999", marginBottom: "16px", letterSpacing: "0.1em" }}>
-                      СОСТАВ ЗАКАЗА
-                    </div>
-                    <div className="space-y-3">
-                      {cart.map((item) => (
-                        <div key={`${item.id}-${item.size}`} className="flex items-center gap-3">
-                          <img src={item.image} alt={item.name} className="w-12 h-14 object-cover flex-shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <div className="text-xs font-bold truncate" style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: "0.05em" }}>
-                              {item.name}
-                            </div>
-                            <div className="text-xs mt-0.5" style={{ color: "#555" }}>{item.size} × {item.qty}</div>
-                          </div>
-                          <div className="text-sm font-black flex-shrink-0">{(item.price * item.qty).toLocaleString("ru")} ₽</div>
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ borderTop: "1px solid #222", marginTop: "16px", paddingTop: "16px" }}>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-xs" style={{ color: "#666" }}>Товары</span>
-                        <span className="text-sm font-bold">{totalPrice.toLocaleString("ru")} ₽</span>
+                {/* Plane */}
+                <div style={{ marginBottom: 16 }}>
+                  <div className="field-label">Самолёт <span className="req">*</span></div>
+                  <select className="form-input" value={plane} onChange={(e) => setPlane(e.target.value)}>
+                    {PLANES.map((p) => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                  <div className="field-hint">Выберите модель вашего самолета</div>
+                </div>
+
+                {/* Color scheme */}
+                <div style={{ marginBottom: 16 }}>
+                  <div className="field-label">Схема окраски <span className="req">*</span></div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {COLOR_SCHEMES.map((cs) => (
+                      <div
+                        key={cs.id}
+                        onClick={() => setColorScheme(cs.id)}
+                        className="color-swatch"
+                        style={{
+                          background: cs.colors.length === 1
+                            ? cs.colors[0]
+                            : `linear-gradient(135deg, ${cs.colors[0]} 50%, ${cs.colors[1] || cs.colors[0]} 50%)`,
+                          border: colorScheme === cs.id ? "3px solid #1a56db" : "3px solid #e5e7eb",
+                          boxShadow: cs.colors[0] === "#ffffff" ? "inset 0 0 0 1px #d1d5db" : "none",
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div className="field-hint">Выберите цветовую схему вашего самолета.</div>
+                </div>
+
+                {/* Livery */}
+                <div style={{ marginBottom: 16 }}>
+                  <div className="field-label">Тип конской униформы <span className="req">*</span></div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <div
+                        key={i}
+                        onClick={() => setLivery(i)}
+                        className={`livery-thumb`}
+                        style={{
+                          border: livery === i ? "2px solid #1a56db" : "2px solid #e5e7eb",
+                        }}
+                      >
+                        <img src={MAIN_IMAGE} alt={`livery-${i}`} style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.7 }} />
                       </div>
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-xs" style={{ color: "#666" }}>Доставка</span>
-                        <span className="text-sm font-bold" style={{ color: totalPrice >= 5000 ? "var(--neon)" : "#F5F5F5" }}>
-                          {totalPrice >= 5000 ? "БЕСПЛАТНО" : "300 ₽"}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center" style={{ borderTop: "1px solid #222", paddingTop: "12px" }}>
-                        <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.1rem" }}>ИТОГО</span>
-                        <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.5rem", color: "var(--neon)" }}>
-                          {(totalPrice + (totalPrice >= 5000 ? 0 : 300)).toLocaleString("ru")} ₽
-                        </span>
-                      </div>
+                    ))}
+                    <div
+                      onClick={() => setLivery(10)}
+                      className="livery-thumb"
+                      style={{ border: livery === 10 ? "2px solid #1a56db" : "2px solid #e5e7eb", fontSize: "1.2rem", color: "#6b7280" }}
+                    >
+                      •••
                     </div>
                   </div>
-                  <button
-                    className="mt-3 text-xs font-semibold flex items-center gap-1"
-                    style={{ color: "#555" }}
-                    onClick={() => { setPage("catalog"); setCartOpen(true); }}
-                  >
-                    <Icon name="ArrowLeft" size={12} /> Изменить корзину
-                  </button>
+                  <div className="field-hint">Выберите стиль</div>
                 </div>
+
+                {/* Tail number */}
+                <div style={{ marginBottom: 16 }}>
+                  <div className="field-label">Номер хвостового оперения <span className="req">*</span></div>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={tailNum}
+                      maxLength={7}
+                      onChange={(e) => setTailNum(e.target.value.toUpperCase())}
+                      placeholder="N75200"
+                    />
+                    <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", fontSize: "0.72rem", color: "#9ca3af" }}>
+                      {tailNum.length}/7
+                    </span>
+                  </div>
+                </div>
+
+                {/* Tail color */}
+                <div style={{ marginBottom: 16 }}>
+                  <div className="field-label">Цвет бортового номера</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {TAIL_COLORS.map((c) => (
+                      <div
+                        key={c}
+                        onClick={() => setTailColor(c)}
+                        className="color-swatch"
+                        style={{
+                          background: c,
+                          border: tailColor === c ? "3px solid #1a56db" : "3px solid #e5e7eb",
+                          boxShadow: c === "#ffffff" ? "inset 0 0 0 1px #d1d5db" : "none",
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Student name */}
+                <div style={{ marginBottom: 16 }}>
+                  <div className="field-label">Имя студента-пилота <span className="req">*</span></div>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Орвилл Райт"
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                  />
+                  <div className="field-hint">Введите имя пилота-стажера.</div>
+                </div>
+
+                {/* CFI name */}
+                <div style={{ marginBottom: 16 }}>
+                  <div className="field-label">Имя CFI <span className="req">*</span></div>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Георгий Цыфаркин"
+                    value={cfiName}
+                    onChange={(e) => setCfiName(e.target.value)}
+                  />
+                  <div className="field-hint">Введите имя преподавателя</div>
+                </div>
+
+                {/* Airport */}
+                <div style={{ marginBottom: 16 }}>
+                  <div className="field-label">Аэропорт (ИКАО) <span className="req">*</span></div>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="КФФА"
+                      value={airport}
+                      maxLength={4}
+                      onChange={(e) => setAirport(e.target.value.toUpperCase())}
+                    />
+                    <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", fontSize: "0.72rem", color: "#9ca3af" }}>
+                      {airport.length}/4
+                    </span>
+                  </div>
+                  <div className="field-hint">Введите код ИКАО (например, KFFA)</div>
+                </div>
+
+                {/* Agree */}
+                <label style={{ display: "flex", gap: 10, fontSize: "0.8rem", color: "#374151", cursor: "pointer", lineHeight: 1.5 }}>
+                  <input
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                    style={{ marginTop: 2, flexShrink: 0 }}
+                  />
+                  Вы несёте ответственность за предоставление корректной информации для персонализации перед нажатием кнопки «Купить сейчас».
+                </label>
               </div>
             </div>
-          )}
+
+            {/* Quantity + buttons */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+              <button className="qty-btn" onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
+              <span style={{ minWidth: 32, textAlign: "center", fontWeight: 600, fontSize: "1rem" }}>{qty}</span>
+              <button className="qty-btn" onClick={() => setQty((q) => q + 1)}>+</button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
+              <button className="btn-add-cart" onClick={handleAddToCart}>
+                ДОБАВИТЬ В КОРЗИНУ
+              </button>
+              <button className="btn-buy-now">
+                КУПИТЬ СЕЙЧАС
+              </button>
+            </div>
+
+            {cartMsg && (
+              <div style={{ background: "#dcfce7", border: "1px solid #16a34a", borderRadius: 6, padding: "10px 14px", fontSize: "0.85rem", color: "#15803d", marginBottom: 12 }}>
+                ✓ Товар добавлен в корзину!
+              </div>
+            )}
+
+            {/* Share */}
+            <button style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.8rem", color: "#6b7280", background: "none", border: "none", cursor: "pointer", padding: "4px 0" }}>
+              <Icon name="Share2" size={14} /> Поделиться
+            </button>
+
+            {/* Description accordion */}
+            <button className="section-toggle" onClick={() => setDescOpen(!descOpen)}>
+              <span>ОПИСАНИЕ</span>
+              <Icon name={descOpen ? "ChevronUp" : "ChevronDown"} size={18} />
+            </button>
+            {descOpen && (
+              <div style={{ fontSize: "0.85rem", lineHeight: 1.75, color: "#374151", paddingBottom: 16 }}>
+                <p style={{ marginBottom: 10 }}>
+                  Создайте по-настоящему персонализированную футболку, указав каждую деталь: имена пилота и инструктора, модель самолёта, схему окраски, код аэропорта ИКАО и дату полёта — превратив этот незабываемый момент в вещь, которую вы сможете носить долгие годы.
+                </p>
+                <p style={{ marginBottom: 10 }}>
+                  Если вы не видите свой самолёт или схему окраски, просто выберите «Другое (три точки…)», загрузите фотографию, и наш художник перерисует её в нашем фирменном стиле — мы изготовим для вас уникальную футболку на заказ.
+                </p>
+                <p style={{ marginBottom: 6, fontWeight: 700 }}>✦ Премиум качество — Сделано в США</p>
+                <p style={{ marginBottom: 6 }}>
+                  Эта лёгкая футболка весом 4,2 унции, изготовленная из исключительно мягкого 100% чёсаного и кольцевого хлопка <em>Airlume</em>, обеспечивает комфорт в течение всего дня и приятные тактильные ощущения.
+                </p>
+                <p>
+                  Печать выполнена с использованием высококачественной технологии DTG, что гарантирует чёткость, яркость и долговечность.
+                </p>
+              </div>
+            )}
+
+            {/* Shipping accordion */}
+            <button className="section-toggle" onClick={() => setShippingOpen(!shippingOpen)}>
+              <span>ДОСТАВКА И ВОЗВРАТ</span>
+              <Icon name={shippingOpen ? "ChevronUp" : "ChevronDown"} size={18} />
+            </button>
+            {shippingOpen && (
+              <div style={{ fontSize: "0.85rem", lineHeight: 1.75, color: "#374151", paddingBottom: 16 }}>
+                <p style={{ marginBottom: 8 }}>🚚 <strong>Бесплатная доставка</strong> по США при заказе от $50</p>
+                <p style={{ marginBottom: 8 }}>📦 Срок изготовления: 3–5 рабочих дней</p>
+                <p style={{ marginBottom: 8 }}>✈️ Доставка: 5–10 рабочих дней</p>
+                <p>↩ Возврат в течение 30 дней при наличии брака производителя. Персонализированные товары возврату не подлежат.</p>
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </main>
 
       {/* FOOTER */}
-      <footer style={{ borderTop: "1px solid #1E1E1E", background: "var(--surface)" }}>
-        <div className="container mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "1.5rem" }}>
-            DRIP<span style={{ color: "var(--neon)" }}>STORE</span>
+      <footer style={{ borderTop: "1px solid #e5e7eb", background: "#f9fafb", padding: "32px 24px" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 24 }}>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", color: "#1e3a5f", marginBottom: 12, letterSpacing: "0.05em" }}>
+              DUSTY FLYER
+            </div>
+            <p style={{ fontSize: "0.8rem", color: "#6b7280", maxWidth: 240, lineHeight: 1.6 }}>
+              Авиационные подарки и одежда для пилотов и любителей авиации.
+            </p>
           </div>
-          <div className="flex gap-6">
-            {navLinks.map((l) => (
-              <button
-                key={l.key}
-                onClick={() => setPage(l.key)}
-                style={{ fontFamily: "'Bebas Neue', sans-serif", color: "#555", letterSpacing: "0.1em" }}
-              >
-                {l.label}
-              </button>
+          <div style={{ display: "flex", gap: 48, flexWrap: "wrap" }}>
+            {[
+              { title: "Магазин", links: ["Футболки на заказ", "Декор для стен", "Все товары"] },
+              { title: "Помощь", links: ["Доставка", "Возврат", "Контакты"] },
+            ].map((col) => (
+              <div key={col.title}>
+                <div style={{ fontWeight: 700, fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10, color: "#374151" }}>{col.title}</div>
+                {col.links.map((l) => (
+                  <div key={l} style={{ fontSize: "0.8rem", color: "#6b7280", marginBottom: 6, cursor: "pointer" }}>{l}</div>
+                ))}
+              </div>
             ))}
           </div>
-          <div className="text-xs" style={{ color: "#333" }}>
-            © 2026 DRIPSTORE. Все права защищены.
-          </div>
+        </div>
+        <div style={{ maxWidth: 1280, margin: "24px auto 0", borderTop: "1px solid #e5e7eb", paddingTop: 16, fontSize: "0.75rem", color: "#9ca3af", textAlign: "center" }}>
+          © 2026 Dusty Flyer. Все права защищены.
         </div>
       </footer>
     </div>
